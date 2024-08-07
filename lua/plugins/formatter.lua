@@ -6,7 +6,7 @@ return { -- Autoformat
     {
       '<leader>fb',
       function()
-        require('conform').format { async = true, lsp_fallback = true }
+        require('conform').format { async = true, lsp_format = 'fallback' }
       end,
       mode = '',
       desc = '[F]ormat buffer',
@@ -15,13 +15,26 @@ return { -- Autoformat
   opts = {
     notify_on_error = false,
     format_on_save = function(bufnr)
+      -- Disable autoformat on certain filetypes
+      local ignore_filetypes = { 'c', 'cpp' }
+      if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then
+        return
+      end
+
       -- Disable "format_on_save lsp_fallback" for languages that don't
       -- have a well standardized coding style. You can add additional
       -- languages here or re-enable it for the disabled ones.
-      local disable_filetypes = { c = true, cpp = true }
+      local disable_filetypes = { 'c', 'cpp' }
+
+      local lsp_format_opt
+      if vim.tbl_contains(disable_filetypes, vim.bo[bufnr].filetype) then
+        lsp_format_opt = 'never'
+      else
+        lsp_format_opt = 'fallback'
+      end
       return {
-        -- timeout_ms = 500,
-        lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+        timeout_ms = 500,
+        lsp_format = lsp_format_opt,
       }
     end,
     formatters_by_ft = {
