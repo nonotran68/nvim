@@ -1,0 +1,5 @@
+require 'dat.options'
+require 'dat.lazy'
+require 'dat.commands'
+require 'dat.autocmds'
+require 'dat.keymaps'
